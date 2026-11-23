@@ -1,6 +1,6 @@
 {
   "name": "gladys-abode",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Abode alarm integration for Gladys Assistant: alarm modes, sensors, locks, lights, cameras, scenes and widgets.",
   "type": "module",

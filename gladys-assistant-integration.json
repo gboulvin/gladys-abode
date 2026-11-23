@@ -8,8 +8,8 @@
     "de": "Steuern Sie Ihre Abode-Alarmanlage: Scharfschalten, Sensoren, Schlösser, Licht, Kameras.",
     "es": "Controle su alarma Abode: armado, sensores, cerraduras, luces y cámaras."
   },
-  "version": "0.0.0",
-  "docker_image": "ghcr.io/gboulvin/gladys-abode:0.0.0",
+  "version": "1.0.0",
+  "docker_image": "ghcr.io/gboulvin/gladys-abode:1.0.0",
   "gladys_version": ">=5.1.0",
   "cover_image": "https://raw.githubusercontent.com/gboulvin/gladys-abode/main/cover.jpg",
   "categories": ["security"],

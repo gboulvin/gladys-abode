@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-23
+
 ### Added
 
 - Abode integration for Gladys Assistant 5.1 or later, over the Abode cloud.
@@ -27,4 +29,5 @@ the notes of the version's GitHub Release.
   the alarm mode.
 - English, French, German and Spanish texts and documentation.
 
-[Unreleased]: https://github.com/gboulvin/gladys-abode/commits/main
+[Unreleased]: https://github.com/gboulvin/gladys-abode/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/gboulvin/gladys-abode/releases/tag/v1.0.0
