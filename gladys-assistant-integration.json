@@ -1,0 +1,597 @@
+{
+  "manifest_version": 1,
+  "type": "device",
+  "name": "Abode",
+  "description": {
+    "en": "Control your Abode alarm: arm, disarm, sensors, locks, lights and cameras.",
+    "fr": "Pilotez votre alarme Abode : armement, capteurs, serrures, lumières et caméras.",
+    "de": "Steuern Sie Ihre Abode-Alarmanlage: Scharfschalten, Sensoren, Schlösser, Licht, Kameras.",
+    "es": "Controle su alarma Abode: armado, sensores, cerraduras, luces y cámaras."
+  },
+  "version": "0.0.0",
+  "docker_image": "ghcr.io/gboulvin/gladys-abode:0.0.0",
+  "gladys_version": ">=5.1.0",
+  "cover_image": "https://raw.githubusercontent.com/gboulvin/gladys-abode/main/cover.jpg",
+  "categories": ["security"],
+  "transports": ["cloud"],
+  "config_schema": [
+    {
+      "key": "intro",
+      "type": "section",
+      "label": {
+        "en": "Connect your Abode account",
+        "fr": "Connectez votre compte Abode",
+        "de": "Abode-Konto verbinden",
+        "es": "Conecte su cuenta Abode"
+      },
+      "description": {
+        "en": "Enter the email and password you use in the Abode app. Abode only offers a cloud API: Gladys reads your system through my.goabode.com. Two-factor authentication must be off for this account: create a dedicated Abode user for Gladys if you use it on your main account.",
+        "fr": "Saisissez l’e-mail et le mot de passe de l’application Abode. Abode ne propose qu’une API cloud : Gladys lit votre système via my.goabode.com. La double authentification doit être désactivée sur ce compte : créez un utilisateur Abode dédié à Gladys si vous l’utilisez sur votre compte principal.",
+        "de": "Geben Sie die E-Mail und das Passwort der Abode-App ein. Abode bietet nur eine Cloud-API: Gladys liest Ihr System über my.goabode.com. Die Zwei-Faktor-Authentifizierung muss für dieses Konto aus sein: Legen Sie für Gladys einen eigenen Abode-Benutzer an, wenn Ihr Hauptkonto sie nutzt.",
+        "es": "Introduzca el correo y la contraseña de la aplicación Abode. Abode solo ofrece una API en la nube: Gladys lee su sistema a través de my.goabode.com. La verificación en dos pasos debe estar desactivada en esta cuenta: cree un usuario de Abode dedicado a Gladys si la usa en su cuenta principal."
+      },
+      "links": [
+        {
+          "url": "https://my.goabode.com",
+          "label": {
+            "en": "Abode web app",
+            "fr": "Application web Abode",
+            "de": "Abode-Web-App",
+            "es": "Aplicación web de Abode"
+          }
+        }
+      ]
+    },
+    {
+      "key": "username",
+      "type": "string",
+      "label": { "en": "Email", "fr": "E-mail", "de": "E-Mail", "es": "Correo electrónico" },
+      "placeholder": {
+        "en": "e.g. me@example.com",
+        "fr": "ex. moi@exemple.fr",
+        "de": "z. B. ich@beispiel.de",
+        "es": "p. ej. yo@ejemplo.es"
+      },
+      "required": true
+    },
+    {
+      "key": "password",
+      "type": "secret",
+      "label": { "en": "Password", "fr": "Mot de passe", "de": "Passwort", "es": "Contraseña" },
+      "required": true
+    },
+    {
+      "key": "refresh_interval",
+      "type": "number",
+      "label": {
+        "en": "Refresh interval (s)",
+        "fr": "Intervalle de rafraîchissement (s)",
+        "de": "Aktualisierungsintervall (s)",
+        "es": "Intervalo de actualización (s)"
+      },
+      "description": {
+        "en": "How often Abode is read, in seconds: alarm mode, sensors, alarms (10 to 300).",
+        "fr": "Fréquence de lecture d’Abode, en secondes : mode, capteurs, alarmes (10 à 300).",
+        "de": "Wie oft Abode gelesen wird, in Sekunden: Modus, Sensoren, Alarme (10 bis 300).",
+        "es": "Frecuencia de lectura de Abode, en segundos: modo, sensores, alarmas (10 a 300)."
+      },
+      "required": false,
+      "default": 15,
+      "min": 10,
+      "max": 300
+    }
+  ],
+  "actions": [
+    {
+      "key": "test_connection",
+      "label": {
+        "en": "Test the connection",
+        "fr": "Tester la connexion",
+        "de": "Verbindung testen",
+        "es": "Probar la conexión"
+      },
+      "timeout_seconds": 30
+    },
+    {
+      "key": "list_automations",
+      "label": {
+        "en": "List the automations",
+        "fr": "Lister les automatisations",
+        "de": "Automationen auflisten",
+        "es": "Listar las automatizaciones"
+      },
+      "timeout_seconds": 30
+    },
+    {
+      "key": "set_mode",
+      "label": {
+        "en": "Change the alarm mode",
+        "fr": "Changer le mode de l’alarme",
+        "de": "Alarmmodus ändern",
+        "es": "Cambiar el modo de la alarma"
+      },
+      "timeout_seconds": 30,
+      "fields": [
+        {
+          "key": "mode",
+          "type": "select",
+          "label": { "en": "Mode", "fr": "Mode", "de": "Modus", "es": "Modo" },
+          "required": true,
+          "options": [
+            {
+              "value": "standby",
+              "label": { "en": "Disarmed", "fr": "Désarmée", "de": "Unscharf", "es": "Desarmada" }
+            },
+            {
+              "value": "home",
+              "label": { "en": "Home", "fr": "Partielle", "de": "Zuhause", "es": "En casa" }
+            },
+            {
+              "value": "away",
+              "label": { "en": "Away", "fr": "Totale", "de": "Abwesend", "es": "Ausente" }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "scene_triggers": [
+    {
+      "key": "mode_changed",
+      "label": {
+        "en": "Abode alarm mode changed",
+        "fr": "Mode de l’alarme Abode changé",
+        "de": "Abode-Alarmmodus geändert",
+        "es": "Modo de la alarma Abode cambiado"
+      },
+      "description": {
+        "en": "The alarm was armed or disarmed, from Gladys, a keypad or the Abode app.",
+        "fr": "L’alarme a été armée ou désarmée, depuis Gladys, un clavier ou l’app Abode.",
+        "de": "Die Alarmanlage wurde scharf oder unscharf geschaltet (Gladys, Tastatur, App).",
+        "es": "La alarma se armó o desarmó, desde Gladys, un teclado o la app Abode."
+      },
+      "fields": [
+        {
+          "key": "mode",
+          "type": "multi_select",
+          "label": {
+            "en": "New mode",
+            "fr": "Nouveau mode",
+            "de": "Neuer Modus",
+            "es": "Nuevo modo"
+          },
+          "options": [
+            {
+              "value": "standby",
+              "label": { "en": "Disarmed", "fr": "Désarmée", "de": "Unscharf", "es": "Desarmada" }
+            },
+            {
+              "value": "home",
+              "label": { "en": "Home", "fr": "Partielle", "de": "Zuhause", "es": "En casa" }
+            },
+            {
+              "value": "away",
+              "label": { "en": "Away", "fr": "Totale", "de": "Abwesend", "es": "Ausente" }
+            }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "key": "mode",
+          "type": "string",
+          "label": {
+            "en": "New mode",
+            "fr": "Nouveau mode",
+            "de": "Neuer Modus",
+            "es": "Nuevo modo"
+          }
+        },
+        {
+          "key": "previous_mode",
+          "type": "string",
+          "label": {
+            "en": "Previous mode",
+            "fr": "Mode précédent",
+            "de": "Vorheriger Modus",
+            "es": "Modo anterior"
+          }
+        }
+      ]
+    },
+    {
+      "key": "alarm_triggered",
+      "label": {
+        "en": "Abode alarm triggered",
+        "fr": "Alarme Abode déclenchée",
+        "de": "Abode-Alarm ausgelöst",
+        "es": "Alarma Abode disparada"
+      },
+      "description": {
+        "en": "The Abode system raised an alarm: intrusion, fire, panic, water leak...",
+        "fr": "Le système Abode a déclenché une alarme : intrusion, incendie, panique, fuite…",
+        "de": "Das Abode-System hat Alarm ausgelöst: Einbruch, Feuer, Panik, Wasserleck…",
+        "es": "El sistema Abode disparó una alarma: intrusión, incendio, pánico, fuga…"
+      },
+      "fields": [
+        {
+          "key": "alarm_type",
+          "type": "multi_select",
+          "label": {
+            "en": "Alarm type",
+            "fr": "Type d’alarme",
+            "de": "Alarmtyp",
+            "es": "Tipo de alarma"
+          },
+          "options": [
+            {
+              "value": "burglary",
+              "label": { "en": "Intrusion", "fr": "Intrusion", "de": "Einbruch", "es": "Intrusión" }
+            },
+            {
+              "value": "fire",
+              "label": {
+                "en": "Fire / smoke",
+                "fr": "Incendie / fumée",
+                "de": "Feuer / Rauch",
+                "es": "Incendio / humo"
+              }
+            },
+            {
+              "value": "co",
+              "label": {
+                "en": "Carbon monoxide",
+                "fr": "Monoxyde de carbone",
+                "de": "Kohlenmonoxid",
+                "es": "Monóxido de carbono"
+              }
+            },
+            {
+              "value": "water",
+              "label": {
+                "en": "Water leak",
+                "fr": "Fuite d’eau",
+                "de": "Wasserleck",
+                "es": "Fuga de agua"
+              }
+            },
+            {
+              "value": "panic",
+              "label": { "en": "Panic", "fr": "Panique", "de": "Panik", "es": "Pánico" }
+            },
+            {
+              "value": "medical",
+              "label": { "en": "Medical", "fr": "Médicale", "de": "Medizinisch", "es": "Médica" }
+            },
+            {
+              "value": "other",
+              "label": { "en": "Other", "fr": "Autre", "de": "Andere", "es": "Otra" }
+            }
+          ]
+        },
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": { "en": "Device", "fr": "Appareil", "de": "Gerät", "es": "Dispositivo" }
+        }
+      ],
+      "variables": [
+        {
+          "key": "alarm_type",
+          "type": "string",
+          "label": {
+            "en": "Alarm type",
+            "fr": "Type d’alarme",
+            "de": "Alarmtyp",
+            "es": "Tipo de alarma"
+          }
+        },
+        {
+          "key": "device_name",
+          "type": "string",
+          "label": {
+            "en": "Device name",
+            "fr": "Nom de l’appareil",
+            "de": "Gerätename",
+            "es": "Nombre del dispositivo"
+          }
+        },
+        {
+          "key": "event_name",
+          "type": "string",
+          "label": { "en": "Event", "fr": "Événement", "de": "Ereignis", "es": "Evento" }
+        }
+      ]
+    },
+    {
+      "key": "device_fault",
+      "label": {
+        "en": "Abode device fault",
+        "fr": "Défaut d’un appareil Abode",
+        "de": "Störung eines Abode-Geräts",
+        "es": "Fallo de un dispositivo Abode"
+      },
+      "description": {
+        "en": "A device reports low battery, tampering, a jam or lost connection.",
+        "fr": "Un appareil signale une pile faible, un sabotage, un blocage ou une perte de lien.",
+        "de": "Ein Gerät meldet schwache Batterie, Sabotage, Blockierung oder Verbindungsverlust.",
+        "es": "Un dispositivo indica batería baja, sabotaje, bloqueo o pérdida de conexión."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": { "en": "Device", "fr": "Appareil", "de": "Gerät", "es": "Dispositivo" }
+        },
+        {
+          "key": "fault",
+          "type": "multi_select",
+          "label": { "en": "Fault", "fr": "Défaut", "de": "Störung", "es": "Fallo" },
+          "options": [
+            {
+              "value": "low_battery",
+              "label": {
+                "en": "Low battery",
+                "fr": "Pile faible",
+                "de": "Batterie schwach",
+                "es": "Batería baja"
+              }
+            },
+            {
+              "value": "tamper",
+              "label": { "en": "Tampering", "fr": "Sabotage", "de": "Sabotage", "es": "Sabotaje" }
+            },
+            {
+              "value": "offline",
+              "label": {
+                "en": "Offline",
+                "fr": "Hors ligne",
+                "de": "Offline",
+                "es": "Sin conexión"
+              }
+            },
+            {
+              "value": "jammed",
+              "label": { "en": "Jammed", "fr": "Bloqué", "de": "Blockiert", "es": "Atascado" }
+            }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "key": "fault",
+          "type": "string",
+          "label": { "en": "Fault", "fr": "Défaut", "de": "Störung", "es": "Fallo" }
+        },
+        {
+          "key": "device_name",
+          "type": "string",
+          "label": {
+            "en": "Device name",
+            "fr": "Nom de l’appareil",
+            "de": "Gerätename",
+            "es": "Nombre del dispositivo"
+          }
+        }
+      ]
+    }
+  ],
+  "scene_actions": [
+    {
+      "key": "set_mode",
+      "label": {
+        "en": "Set the Abode alarm mode",
+        "fr": "Changer le mode de l’alarme Abode",
+        "de": "Abode-Alarmmodus setzen",
+        "es": "Cambiar el modo de la alarma Abode"
+      },
+      "description": {
+        "en": "Arm (home or away) or disarm the Abode alarm.",
+        "fr": "Arme (partielle ou totale) ou désarme l’alarme Abode.",
+        "de": "Schaltet die Abode-Alarmanlage scharf (Zuhause/Abwesend) oder unscharf.",
+        "es": "Arma (en casa o ausente) o desarma la alarma Abode."
+      },
+      "timeout_seconds": 30,
+      "fields": [
+        {
+          "key": "mode",
+          "type": "select",
+          "label": { "en": "Mode", "fr": "Mode", "de": "Modus", "es": "Modo" },
+          "required": true,
+          "options": [
+            {
+              "value": "standby",
+              "label": { "en": "Disarmed", "fr": "Désarmée", "de": "Unscharf", "es": "Desarmada" }
+            },
+            {
+              "value": "home",
+              "label": { "en": "Home", "fr": "Partielle", "de": "Zuhause", "es": "En casa" }
+            },
+            {
+              "value": "away",
+              "label": { "en": "Away", "fr": "Totale", "de": "Abwesend", "es": "Ausente" }
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "key": "mode",
+          "type": "string",
+          "label": {
+            "en": "Confirmed mode",
+            "fr": "Mode confirmé",
+            "de": "Bestätigter Modus",
+            "es": "Modo confirmado"
+          }
+        }
+      ]
+    },
+    {
+      "key": "trigger_automation",
+      "label": {
+        "en": "Run an Abode automation",
+        "fr": "Lancer une automatisation Abode",
+        "de": "Abode-Automation ausführen",
+        "es": "Ejecutar una automatización Abode"
+      },
+      "description": {
+        "en": "Run an automation of the Abode app, by name or identifier.",
+        "fr": "Lance une automatisation de l’app Abode, par son nom ou son identifiant.",
+        "de": "Führt eine Automation der Abode-App aus, nach Name oder Kennung.",
+        "es": "Ejecuta una automatización de la app Abode, por nombre o identificador."
+      },
+      "timeout_seconds": 30,
+      "fields": [
+        {
+          "key": "automation",
+          "type": "string",
+          "label": {
+            "en": "Automation name",
+            "fr": "Nom de l’automatisation",
+            "de": "Name der Automation",
+            "es": "Nombre de la automatización"
+          },
+          "placeholder": {
+            "en": "e.g. Good night",
+            "fr": "ex. Bonne nuit",
+            "de": "z. B. Gute Nacht",
+            "es": "p. ej. Buenas noches"
+          },
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "key": "triggered",
+          "type": "boolean",
+          "label": {
+            "en": "Automation found and run",
+            "fr": "Automatisation trouvée et lancée",
+            "de": "Automation gefunden und ausgeführt",
+            "es": "Automatización encontrada y ejecutada"
+          }
+        },
+        {
+          "key": "automation_name",
+          "type": "string",
+          "label": {
+            "en": "Automation name",
+            "fr": "Nom de l’automatisation",
+            "de": "Name der Automation",
+            "es": "Nombre de la automatización"
+          }
+        }
+      ]
+    },
+    {
+      "key": "capture_image",
+      "label": {
+        "en": "Take an Abode camera snapshot",
+        "fr": "Prendre une photo avec une caméra Abode",
+        "de": "Abode-Kamerabild aufnehmen",
+        "es": "Tomar una foto con una cámara Abode"
+      },
+      "description": {
+        "en": "Take a snapshot, then send it with the “Send a camera image” action.",
+        "fr": "Prend une photo, à envoyer ensuite avec l’action « Envoyer une image de caméra ».",
+        "de": "Nimmt ein Bild auf, danach mit „Kamerabild senden“ verschicken.",
+        "es": "Toma una foto y envíela luego con la acción «Enviar una imagen de cámara»."
+      },
+      "timeout_seconds": 45,
+      "fields": [
+        {
+          "key": "camera",
+          "type": "select",
+          "source": "devices",
+          "label": { "en": "Camera", "fr": "Caméra", "de": "Kamera", "es": "Cámara" },
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "key": "captured",
+          "type": "boolean",
+          "label": {
+            "en": "Snapshot taken",
+            "fr": "Photo prise",
+            "de": "Bild aufgenommen",
+            "es": "Foto tomada"
+          }
+        }
+      ]
+    }
+  ],
+  "widgets": [
+    {
+      "key": "abode_alarm",
+      "label": {
+        "en": "Abode alarm",
+        "fr": "Alarme Abode",
+        "de": "Abode-Alarm",
+        "es": "Alarma Abode"
+      },
+      "description": {
+        "en": "Alarm mode, open doors and windows, faults, last alarm, arm buttons.",
+        "fr": "Mode de l’alarme, ouvertures, défauts, dernière alarme, boutons d’armement.",
+        "de": "Alarmmodus, offene Türen und Fenster, Störungen, letzter Alarm, Tasten.",
+        "es": "Modo de alarma, aperturas, fallos, última alarma, botones de armado."
+      },
+      "icon": "shield",
+      "action_timeout_seconds": 30,
+      "settings": [
+        {
+          "key": "allow_disarm",
+          "type": "boolean",
+          "label": {
+            "en": "Show the disarm button",
+            "fr": "Afficher le bouton de désarmement",
+            "de": "Taste zum Unscharfschalten zeigen",
+            "es": "Mostrar el botón de desarmar"
+          },
+          "description": {
+            "en": "Anyone who sees this dashboard could then disarm the alarm.",
+            "fr": "Toute personne voyant ce tableau de bord pourra alors désarmer l’alarme.",
+            "de": "Jeder, der dieses Dashboard sieht, kann die Anlage dann unscharf schalten.",
+            "es": "Cualquiera que vea este panel podrá entonces desarmar la alarma."
+          },
+          "default": false
+        }
+      ]
+    },
+    {
+      "key": "abode_openings",
+      "label": {
+        "en": "Abode doors and windows",
+        "fr": "Portes et fenêtres Abode",
+        "de": "Abode-Türen und -Fenster",
+        "es": "Puertas y ventanas Abode"
+      },
+      "description": {
+        "en": "Open or closed state of the Abode door, window and garage sensors.",
+        "fr": "État ouvert ou fermé des capteurs de porte, fenêtre et garage Abode.",
+        "de": "Offen/geschlossen-Zustand der Abode-Tür-, Fenster- und Garagensensoren.",
+        "es": "Estado abierto o cerrado de los sensores de puerta, ventana y garaje."
+      },
+      "icon": "log-in"
+    },
+    {
+      "key": "abode_timeline",
+      "label": {
+        "en": "Abode timeline",
+        "fr": "Historique Abode",
+        "de": "Abode-Verlauf",
+        "es": "Historial Abode"
+      },
+      "description": {
+        "en": "The latest events of the Abode system, alarms highlighted.",
+        "fr": "Les derniers événements du système Abode, alarmes en évidence.",
+        "de": "Die neuesten Ereignisse des Abode-Systems, Alarme hervorgehoben.",
+        "es": "Los últimos eventos del sistema Abode, con las alarmas resaltadas."
+      },
+      "icon": "list"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "name": "gladys-abode",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Abode alarm integration for Gladys Assistant: alarm modes, sensors, locks, lights, cameras, scenes and widgets.",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@gladysassistant/integration-sdk": "^0.16.1",
+    "jpeg-js": "^0.4.4"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.12.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.13.0",
+    "prettier": "^3.9.9"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gboulvin/gladys-abode.git"
+  },
+  "license": "Apache-2.0"
+}
